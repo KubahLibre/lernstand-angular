@@ -14,4 +14,17 @@ export class LernstandService {
     const antwort = await fetch(`${this.url}/themen`);
     return (await antwort.json()) ?? [];
   }
+
+  async themaAnlegen(neu: {titel: string; kategorie_id: number; notiz: string | null}): Promise<Thema> {
+    const antwort = await fetch(`${this.url}/themen`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(neu),
+    });
+    if (!antwort.ok) {
+      const fehler = await antwort.json();
+      throw new Error(fehler.detail ?? `HTTP ${antwort.status}`);
+    }
+    return antwort.json();
+  }
 }

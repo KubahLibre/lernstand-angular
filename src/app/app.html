@@ -3,6 +3,27 @@
   <p>Browser &rarr; FastAPI &rarr; PostgreSQL — jetzt mit Angular</p>
 </header>
 
+<section>
+  <h2>Neues Thema anlegen</h2>
+  <form [formGroup]="neuForm" (submit)="anlegen()">
+    <label for="titel">Titel (Pflicht)</label>
+    <input id="titel" type="text" formControlName="titel" />
+
+    <label for="kategorie">Kategorie</label>
+    <select id="kategorie" formControlName="kategorieId">
+      <option value="" disabled>Kategorie wählen…</option>
+      @for (kategorie of kategorien; track kategorie.id) {
+        <option [value]="kategorie.id">{{ kategorie.name }}</option>
+      }
+    </select>
+
+    <label for="notiz">Notiz (freiwillig)</label>
+    <input id="notiz" type="text" formControlName="notiz" />
+
+    <button type="submit" class="primary">Anlegen</button>
+  </form>
+</section>
+
 <main>
   @for (thema of themen; track thema.id) {
     <article>
