@@ -24,16 +24,36 @@
   </form>
 </section>
 
+<section>
+  <label for="filter">Nur zeigen</label>
+  <select id="filter" (change)="filterAuswaehlen($any($event.target).value)">
+    <option value="">alle</option>
+    <option value="offen">offen</option>
+    <option value="angefangen">angefangen</option>
+    <option value="erledigt">erledigt</option>
+  </select>
+</section>
+
 <main>
   @for (thema of themen; track thema.id) {
     <article>
       <h2>{{ thema.titel }}</h2>
-      <p>Status: {{ thema.status }} | Kategorie: {{ kategorieName(thema.kategorie_id) }}</p>
+      <p>
+        <select (change)="statusGeaendert(thema, $any($event.target).value)">
+          @for (s of ['offen', 'angefangen', 'erledigt']; track s) {
+            <option [value]="s" [selected]="s === thema.status">{{ s }}</option>
+          }
+        </select>
+        | Kategorie: {{ kategorieName(thema.kategorie_id) }}
+      </p>
       @if (thema.notiz) {
         <p>Notiz: {{ thema.notiz }}</p>
       }
     </article>
   } @empty {
-    <p>Noch keine Themen geladen …</p>
+    @if (statusFilter) {
+      <p>Keine Themen mit Status „{{ statusFilter }}".</p>
+    } @else {
+      <p>Noch keine Themen in der Datenbank.</p>
+    }
   }
-</main>
