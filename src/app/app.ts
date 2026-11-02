@@ -15,10 +15,16 @@ export class App {
   themen: Thema[] = [];
   kategorien: Kategorie[] = [];
   statusFilter = '';
+  bearbeitenId: number | null = null;
 
   neuForm = new FormGroup({
     titel: new FormControl('', {nonNullable: true}),
     kategorieId: new FormControl('', {nonNullable: true}),
+    notiz: new FormControl('', {nonNullable: true}),
+  });
+
+  aendernForm = new FormGroup({
+    titel: new FormControl('', {nonNullable: true}),
     notiz: new FormControl('', {nonNullable: true}),
   });
 
@@ -34,6 +40,16 @@ export class App {
     return this.kategorien.find((kategorie) => kategorie.id === id)?.name ?? `Unbekannte Kategorie (${id})`;
   }
 
+  themenFrischLaden() {
+    const laden = this.statusFilter
+      ? this.lernstandService.getThemenNachStatus(this.statusFilter)
+      : this.lernstandService.getThemen();
+    laden.then((themen) => {
+      this.themen = themen;
+      this.changeDetectorRef.markForCheck();
+    });
+  }
+
   anlegen() {
     const werte = this.neuForm.getRawValue();
     if (!werte.kategorieId) {
@@ -46,19 +62,37 @@ export class App {
     }).then(() => this.themenFrischLaden());
   }
 
-  themenFrischLaden() {
-    const laden = this.statusFilter
-      ? this.lernstandService.getThemenNachStatus(this.statusFilter)
-      : this.lernstandService.getThemen();
-        laden.then((themen) => {
-      console.log('geladene Themen:', this.statusFilter, themen.length);
-      this.themen = themen;
-      this.changeDetectorRef.markForCheck();
+  statusGeaendert(thema: Thema, neuerStatus: string) {
+    this.lernstandService.themaAendern(thema.id, {status: neuerStatus}).then(() => {
+      this.themenFrischLaden();
     });
   }
 
-  statusGeaendert(thema: Thema, neuerStatus: string) {
-    this.lernstandService.themaAendern(thema.id, neuerStatus).then(() => {
+  bearbeitenStarten(thema: Thema) {
+    this.bearbeitenId = thema.id;
+    this.aendernForm.setValue({titel: thema.titel, notiz: thema.notiz ?? ''});
+  }
+
+  bearbeitenAbbrechen() {
+    this.bearbeitenId = null;
+  }
+
+  speichern(thema: Thema) {
+    const werte = this.aendernForm.getRawValue();
+    this.lernstandService.themaAendern(thema.id, {
+      titel: werte.titel.trim() || thema.titel,
+      notiz: werte.notiz.trim() || null,
+    }).then(() => {
+      this.bearbeitenId = null;
+      this.themenFrischLaden();
+    });
+  }
+
+  loeschen(thema: Thema) {
+    if (!window.confirm(`Thema „${thema.titel}" wirklich löschen?`)) {
+      return;
+    }
+    this.lernstandService.themaLoeschen(thema.id).then(() => {
       this.themenFrischLaden();
     });
   }

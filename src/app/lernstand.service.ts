@@ -28,17 +28,30 @@ export class LernstandService {
     return antwort.json();
   }
 
-  async themaAendern(id: number, status: string): Promise<Thema> {
+  async themaAendern(
+    id: number,
+    aenderung: {status?: string; titel?: string; notiz?: string | null},
+  ): Promise<Thema> {
     const antwort = await fetch(`${this.url}/themen/${id}`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({status}),
+      body: JSON.stringify(aenderung),
     });
     if (!antwort.ok) {
       const fehler = await antwort.json();
       throw new Error(fehler.detail ?? `HTTP ${antwort.status}`);
     }
     return antwort.json();
+  }
+
+  async themaLoeschen(id: number): Promise<void> {
+    const antwort = await fetch(`${this.url}/themen/${id}`, {
+      method: 'DELETE',
+    });
+    if (!antwort.ok) {
+      const fehler = await antwort.json();
+      throw new Error(fehler.detail ?? `HTTP ${antwort.status}`);
+    }
   }
 
   async getThemenNachStatus(status: string): Promise<Thema[]> {

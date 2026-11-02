@@ -49,6 +49,21 @@
       @if (thema.notiz) {
         <p>Notiz: {{ thema.notiz }}</p>
       }
+      @if (bearbeitenId === thema.id) {
+        <form [formGroup]="aendernForm" (submit)="speichern(thema)">
+          <label for="a-titel">Titel</label>
+          <input id="a-titel" type="text" formControlName="titel" />
+          <label for="a-notiz">Notiz</label>
+          <input id="a-notiz" type="text" formControlName="notiz" />
+          <button type="submit" class="primary">Speichern</button>
+          <button type="button" (click)="bearbeitenAbbrechen()">Abbrechen</button>
+        </form>
+      } @else {
+        <p>
+          <button type="button" (click)="bearbeitenStarten(thema)">Bearbeiten</button>
+          <button type="button" (click)="loeschen(thema)">Löschen</button>
+        </p>
+      }
     </article>
   } @empty {
     @if (statusFilter) {
@@ -57,3 +72,4 @@
       <p>Noch keine Themen in der Datenbank.</p>
     }
   }
+</main>
