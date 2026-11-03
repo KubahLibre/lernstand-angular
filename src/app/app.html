@@ -1,13 +1,14 @@
 <header>
   <h1>Lernstand</h1>
   <p>Browser &rarr; FastAPI &rarr; PostgreSQL — jetzt mit Angular</p>
-  @if (fehler) {
+</header>
+
+@if (fehler) {
   <p class="fehler">
     {{ fehler }}
     <button type="button" (click)="fehlerWeg()">Okay, behoben</button>
   </p>
 }
-</header>
 
 <section>
   <h2>Neues Thema anlegen</h2>
@@ -28,6 +29,25 @@
 
     <button type="submit" class="primary">Anlegen</button>
   </form>
+</section>
+
+<section>
+  <h2>Kategorien</h2>
+  <form [formGroup]="kategorieForm" (submit)="kategorieNeuAnlegen()">
+    <label for="k-name">Name (Pflicht)</label>
+    <input id="k-name" type="text" formControlName="name" />
+    <button type="submit" class="primary">Anlegen</button>
+  </form>
+  <ul>
+    @for (kategorie of kategorien; track kategorie.id) {
+      <li>
+        {{ kategorie.name }}
+        <button type="button" (click)="kategorieLoeschen(kategorie)">Löschen</button>
+      </li>
+    } @empty {
+      <li>Noch keine Kategorien.</li>
+    }
+  </ul>
 </section>
 
 <section>

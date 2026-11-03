@@ -29,6 +29,10 @@ export class App {
     notiz: new FormControl('', {nonNullable: true}),
   });
 
+  kategorieForm = new FormGroup({
+    name: new FormControl('', {nonNullable: true}),
+  });
+
   constructor() {
     this.lernstandService.getKategorien()
       .then((kategorien) => {
@@ -119,6 +123,45 @@ export class App {
   filterAuswaehlen(status: string) {
     this.statusFilter = status;
     this.themenFrischLaden();
+  }
+
+  kategorieNeuAnlegen() {
+    const werte = this.kategorieForm.getRawValue();
+    const name = werte.name.trim();
+    if (!name) {
+      return;
+    }
+    this.lernstandService.kategorieAnlegen(name)
+      .then(() => {
+        this.kategorieForm.patchValue({name: ''});
+        this.fehler = null;
+        return this.lernstandService.getKategorien();
+      })
+      .then((kategorien) => {
+        this.kategorien = kategorien;
+        this.changeDetectorRef.markForCheck();
+      })
+      .catch(this.fehlerUmschreiben);
+  }
+
+  kategorieLoeschen(kategorie: Kategorie) {
+    const benutzt = this.themen.some((thema) => thema.kategorie_id === kategorie.id);
+    const hinweis = benutzt
+      ? ' Sie wird noch von Themen benutzt — der Server wird das verweigern.'
+      : '';
+    if (!window.confirm(`Kategorie „${kategorie.name}" löschen?${hinweis}`)) {
+      return;
+    }
+    this.lernstandService.kategorieLoeschen(kategorie.id)
+      .then(() => {
+        this.fehler = null;
+        return this.lernstandService.getKategorien();
+      })
+      .then((kategorien) => {
+        this.kategorien = kategorien;
+        this.changeDetectorRef.markForCheck();
+      })
+      .catch(this.fehlerUmschreiben);
   }
 
   fehlerUmschreiben = (aufruf: unknown) => {
