@@ -16,6 +16,7 @@ export class App {
   kategorien: Kategorie[] = [];
   statusFilter = '';
   bearbeitenId: number | null = null;
+  fehler: string | null = null;
 
   neuForm = new FormGroup({
     titel: new FormControl('', {nonNullable: true}),
@@ -29,10 +30,12 @@ export class App {
   });
 
   constructor() {
-    this.lernstandService.getKategorien().then((kategorien) => {
-      this.kategorien = kategorien;
-      this.changeDetectorRef.markForCheck();
-    });
+    this.lernstandService.getKategorien()
+      .then((kategorien) => {
+        this.kategorien = kategorien;
+        this.changeDetectorRef.markForCheck();
+      })
+      .catch(this.fehlerUmschreiben);
     this.themenFrischLaden();
   }
 
@@ -44,10 +47,12 @@ export class App {
     const laden = this.statusFilter
       ? this.lernstandService.getThemenNachStatus(this.statusFilter)
       : this.lernstandService.getThemen();
-    laden.then((themen) => {
-      this.themen = themen;
-      this.changeDetectorRef.markForCheck();
-    });
+    laden
+      .then((themen) => {
+        this.themen = themen;
+        this.changeDetectorRef.markForCheck();
+      })
+      .catch(this.fehlerUmschreiben);
   }
 
   anlegen() {
@@ -59,13 +64,21 @@ export class App {
       titel: werte.titel.trim() || 'Ohne Titel',
       kategorie_id: Number(werte.kategorieId),
       notiz: werte.notiz.trim() || null,
-    }).then(() => this.themenFrischLaden());
+    })
+      .then(() => {
+        this.fehler = null;
+        this.themenFrischLaden();
+      })
+      .catch(this.fehlerUmschreiben);
   }
 
   statusGeaendert(thema: Thema, neuerStatus: string) {
-    this.lernstandService.themaAendern(thema.id, {status: neuerStatus}).then(() => {
-      this.themenFrischLaden();
-    });
+    this.lernstandService.themaAendern(thema.id, {status: neuerStatus})
+      .then(() => {
+        this.fehler = null;
+        this.themenFrischLaden();
+      })
+      .catch(this.fehlerUmschreiben);
   }
 
   bearbeitenStarten(thema: Thema) {
@@ -82,23 +95,41 @@ export class App {
     this.lernstandService.themaAendern(thema.id, {
       titel: werte.titel.trim() || thema.titel,
       notiz: werte.notiz.trim() || null,
-    }).then(() => {
-      this.bearbeitenId = null;
-      this.themenFrischLaden();
-    });
+    })
+      .then(() => {
+        this.bearbeitenId = null;
+        this.fehler = null;
+        this.themenFrischLaden();
+      })
+      .catch(this.fehlerUmschreiben);
   }
 
   loeschen(thema: Thema) {
     if (!window.confirm(`Thema „${thema.titel}" wirklich löschen?`)) {
       return;
     }
-    this.lernstandService.themaLoeschen(thema.id).then(() => {
-      this.themenFrischLaden();
-    });
+    this.lernstandService.themaLoeschen(thema.id)
+      .then(() => {
+        this.fehler = null;
+        this.themenFrischLaden();
+      })
+      .catch(this.fehlerUmschreiben);
   }
 
   filterAuswaehlen(status: string) {
     this.statusFilter = status;
     this.themenFrischLaden();
+  }
+
+  fehlerUmschreiben = (aufruf: unknown) => {
+    this.fehler = aufruf instanceof Error
+      ? aufruf.message
+      : `Unerwarteter Fehler: ${String(aufruf)}`;
+    this.changeDetectorRef.markForCheck();
+  };
+
+  fehlerWeg() {
+    this.fehler = null;
+    this.changeDetectorRef.markForCheck();
   }
 }

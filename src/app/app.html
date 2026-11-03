@@ -1,6 +1,12 @@
 <header>
   <h1>Lernstand</h1>
   <p>Browser &rarr; FastAPI &rarr; PostgreSQL — jetzt mit Angular</p>
+  @if (fehler) {
+  <p class="fehler">
+    {{ fehler }}
+    <button type="button" (click)="fehlerWeg()">Okay, behoben</button>
+  </p>
+}
 </header>
 
 <section>
