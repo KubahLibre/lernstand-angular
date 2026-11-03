@@ -12,7 +12,7 @@
 
 <section>
   <h2>Neues Thema anlegen</h2>
-  <form [formGroup]="neuForm" (submit)="anlegen()">
+  <form class="thema-form" [formGroup]="neuForm" (submit)="anlegen()">
     <label for="titel">Titel (Pflicht)</label>
     <input id="titel" type="text" formControlName="titel" />
 
@@ -33,7 +33,7 @@
 
 <section>
   <h2>Kategorien</h2>
-  <form [formGroup]="kategorieForm" (submit)="kategorieNeuAnlegen()">
+  <form class="kategorie-form" [formGroup]="kategorieForm" (submit)="kategorieNeuAnlegen()">
     <label for="k-name">Name (Pflicht)</label>
     <input id="k-name" type="text" formControlName="name" />
     <button type="submit" class="primary">Anlegen</button>
@@ -50,7 +50,7 @@
   </ul>
 </section>
 
-<section>
+<section class="filter-zeile">
   <label for="filter">Nur zeigen</label>
   <select id="filter" (change)="filterAuswaehlen($any($event.target).value)">
     <option value="">alle</option>
@@ -65,7 +65,7 @@
     <article>
       <h2>{{ thema.titel }}</h2>
       <p>
-        <select (change)="statusGeaendert(thema, $any($event.target).value)">
+        <select [class]="statusKlasse(thema.status)" (change)="statusGeaendert(thema, $any($event.target).value)">
           @for (s of ['offen', 'angefangen', 'erledigt']; track s) {
             <option [value]="s" [selected]="s === thema.status">{{ s }}</option>
           }

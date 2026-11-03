@@ -46,6 +46,9 @@ export class App {
   kategorieName(id: number): string {
     return this.kategorien.find((kategorie) => kategorie.id === id)?.name ?? `Unbekannte Kategorie (${id})`;
   }
+    statusKlasse(status: string): string {
+    return `status-${status}`;
+  }
 
   themenFrischLaden() {
     const laden = this.statusFilter
