@@ -10,6 +10,29 @@ export class LernstandService {
     return (await antwort.json()) ?? [];
   }
 
+  async kategorieAnlegen(name: string): Promise<Kategorie> {
+    const antwort = await fetch(`${this.url}/kategorien`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name}),
+    });
+    if (!antwort.ok) {
+      const fehler = await antwort.json();
+      throw new Error(fehler.detail ?? `HTTP ${antwort.status}`);
+    }
+    return antwort.json();
+  }
+
+  async kategorieLoeschen(id: number): Promise<void> {
+    const antwort = await fetch(`${this.url}/kategorien/${id}`, {
+      method: 'DELETE',
+    });
+    if (!antwort.ok) {
+      const fehler = await antwort.json();
+      throw new Error(fehler.detail ?? `HTTP ${antwort.status}`);
+    }
+  }
+
   async getThemen(): Promise<Thema[]> {
     const antwort = await fetch(`${this.url}/themen`);
     return (await antwort.json()) ?? [];
