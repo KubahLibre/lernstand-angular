@@ -15,6 +15,21 @@ body {
   padding: 1rem 1.5rem 4rem;
 }
 
+/* Die drei Sektionen (Anlegen, Kategorien, Filter) als Karten — wie .form-karte früher */
+section {
+  background: white;
+  border: 1px solid #e8e6f7;
+  border-radius: 12px;
+  padding: 1rem 1.25rem 1.25rem;
+  margin: 1.25rem 0;
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+section h2 {
+  margin-top: 0;
+}
+
+/* Beschriftungen über den Feldern */
 label {
   display: block;
   margin: 0.75rem 0 0.25rem;
@@ -28,6 +43,7 @@ select {
   border-radius: 6px;
 }
 
+/* Fehlerbanner */
 .fehler {
   background: #fdeaea;
   border: 1px solid var(--danger-color);
@@ -36,17 +52,31 @@ select {
   border-radius: 8px;
 }
 
-article {
+/* Themen als Kachel-Raster — nebeneinander, wo sie hinpassen */
+main {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+main article {
   background: var(--accent-color);
   border-radius: 12px;
   padding: 1rem 1.25rem;
-  margin: 1rem 0;
+  margin: 0;
 }
 
 article h2 {
   margin: 0 0 0.5rem;
 }
 
+/* Leer-/Hinweismeldungen überspannen die ganze Reihe */
+main > p {
+  grid-column: 1 / -1;
+  margin: 0.5rem 0;
+}
+
+/* Buttons */
 button {
   padding: 0.45rem 0.9rem;
   border-radius: 8px;
